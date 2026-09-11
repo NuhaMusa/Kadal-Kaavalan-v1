@@ -54,4 +54,4 @@ The firmware is built in four independently demo-able layers — if time runs ou
 
 ## Team
 
-Team ICONIC — Shoreline Labs, Chennai Institute of Technology, ECE
+Team ICONIC — Shoreline Labs, Chennai Institute of Technology
