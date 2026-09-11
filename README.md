@@ -1,15 +1,15 @@
 # Kadal Kaavalan
 ### Sea Guard for Every Fisherman
 
-A fully offline maritime boundary alert device for fishermen[cite: 2]. It warns the fisherman directly on his boat before he approaches the International Maritime Boundary Line (IMBL) — no SIM, no cellular signal, no subscription required[cite: 2].
+A fully offline maritime boundary alert device for fishermen. It warns the fisherman directly on his boat before he approaches the International Maritime Boundary Line (IMBL) — no SIM, no cellular signal, no subscription required.
 
-**This hackathon prototype runs on 2×18650 lithium batteries.**[cite: 2] Solar charging is on the roadmap (see Future Plans) but is not part of this build[cite: 2].
+**This hackathon prototype runs on 2×18650 lithium batteries.**Solar charging is on the roadmap (see Future Plans) but is not part of this build.
 
-Built by **Team ICONIC — Shoreline Labs**, Chennai Institute of Technology (ECE), for **EMbrix'26 VEGATHON** (BAIT × C-DAC India, Hardware Innovation Track)[cite: 2].
+Built by **Team ICONIC — Shoreline Labs**, Chennai Institute of Technology (ECE), for **EMBRIX'26 VEGATHON** (BAIT × C-DAC India, Hardware Innovation Track).
 
 ## The problem
 
-Existing Vessel Monitoring Systems (VMS) report a fisherman's location to the coast guard — but the fisherman himself gets no warning[cite: 2]. The gap between what the coast guard knows and what the fisherman knows is what leads to accidental boundary crossings and arrests[cite: 2]. Kadal Kaavalan closes that gap by warning the fisherman directly, on-device, in real time[cite: 2].
+Existing Vessel Monitoring Systems (VMS) report a fisherman's location to the coast guard — but the fisherman himself gets no warning. The gap between what the coast guard knows and what the fisherman knows is what leads to accidental boundary crossings and arrests. Kadal Kaavalan closes that gap by warning the fisherman directly, on-device, in real time.
 
 ## System architecture & workflow
 
@@ -84,10 +84,10 @@ kadal-kaavalan/
 
 ## Future plans
 
-- Solar charging enclosure integration (prototype is currently battery-powered)[cite: 2]
+- Solar charging enclosure integration (prototype is currently battery-powered)
 - Dedicated shore dashboard interface and multi-hop LoRa mesh networking
-- Satellite fallback for extended offshore zones beyond LoRa range[cite: 2]
-- Field trials with local coastal fishing communities[cite: 2]
+- Satellite fallback for extended offshore zones beyond LoRa range
+- Field trials with local coastal fishing communities
 
 ## Team
 
