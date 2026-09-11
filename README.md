@@ -24,7 +24,7 @@ kadal-kaavalan/
 ├── firmware/
 │   ├── vega-boat-unit/       Boat unit firmware, one folder per build layer
 │   └── esp32-shore-unit/     Shore unit firmware, one folder per build layer
-└── docs/                     Wiring diagrams, workflow playbook, explainer doc
+└── docs/                     
 ```
 
 ## Build layers
