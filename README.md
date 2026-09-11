@@ -1,56 +1,93 @@
 # Kadal Kaavalan
 ### Sea Guard for Every Fisherman
 
-A fully offline maritime boundary alert device for fishermen. It warns the fisherman directly on his boat before he approaches the International Maritime Boundary Line (IMBL) — no SIM, no cellular signal, no subscription required.
+A fully offline maritime boundary alert device for fishermen[cite: 2]. It warns the fisherman directly on his boat before he approaches the International Maritime Boundary Line (IMBL) — no SIM, no cellular signal, no subscription required[cite: 2].
 
-**This hackathon prototype runs on 2×18650 lithium batteries.** Solar charging is on the roadmap (see Future Plans) but is not part of this build.
+**This hackathon prototype runs on 2×18650 lithium batteries.**[cite: 2] Solar charging is on the roadmap (see Future Plans) but is not part of this build[cite: 2].
 
-Built by **Team ICONIC — Shoreline Labs**, Chennai Institute of Technology (ECE), for **EMbrix'26 VEGATHON** (BAIT × C-DAC India, Hardware Innovation Track).
+Built by **Team ICONIC — Shoreline Labs**, Chennai Institute of Technology (ECE), for **EMbrix'26 VEGATHON** (BAIT × C-DAC India, Hardware Innovation Track)[cite: 2].
 
 ## The problem
 
-Existing Vessel Monitoring Systems (VMS) report a fisherman's location to the coast guard — but the fisherman himself gets no warning. The gap between what the coast guard knows and what the fisherman knows is what leads to accidental boundary crossings and arrests. Kadal Kaavalan closes that gap by warning the fisherman directly, on-device, in real time.
+Existing Vessel Monitoring Systems (VMS) report a fisherman's location to the coast guard — but the fisherman himself gets no warning[cite: 2]. The gap between what the coast guard knows and what the fisherman knows is what leads to accidental boundary crossings and arrests[cite: 2]. Kadal Kaavalan closes that gap by warning the fisherman directly, on-device, in real time[cite: 2].
 
-## How it works
+## System architecture & workflow
 
-- **Boat unit** (VEGA ARIES v2, THEJAS32 RISC-V): runs a geofence state machine (SAFE / WARNING / DANGER / CROSSED) using GPS + Haversine distance to the boundary. Drives LEDs, an OLED display, audio alerts, and a BMP280-based storm warning. Sends LoRa packets to shore on DANGER/CROSSED/SOS. A physical **SOS button** triggers an instant, repeating LoRa broadcast with GPS coordinates; an MPU9250 also auto-triggers an SOS if the boat tilts past 60° for more than 2 seconds (man-overboard detection).
-- **Shore unit** (ESP32): receives LoRa packets, prints fleet alerts, and serves a live web dashboard over its own WiFi access point — the dashboard turns red on any SOS or man-overboard alert.
-- Runs entirely offline — the boundary alert to the fisherman never depends on LoRa, WiFi, or any network being up.
+The system uses a distributed three-node architecture across the boat and shore:
+
+
+```
+
+[ GPS Module (u-blox NEO-6M) ]
+│
+▼
+[ VEGA ARIES v2 (Boat Core) ] ── (Peripherals: LEDs, Buzzer, BMP280, MPU9250, SOS Button)
+│
+UART2 (State String)
+▼
+[ ESP32 #1 (Boat Transceiver) ]
+│
+LoRa Packet (SX1278)
+▼
+[ ESP32 #2 (Shore Receiver) ] ──▶ Serial Monitor Fleet Alert Logging
+
+```
+
+- **Boat Unit (Core Processor - VEGA ARIES v2, THEJAS32 RISC-V):**
+  - Reads GPS data (u-blox NEO-6M).
+  - Runs the local geofence engine to evaluate zone status: `SAFE`, `WARNING`, `DANGER`, or `CROSSED`.
+  - Drives local indicators (LEDs + buzzer), environmental storm monitoring (BMP280), tilt/man-overboard detection (MPU9250), and monitors the hardware SOS button.
+  - Transmits serialized status packets to the onboard transmitter over **UART2**:
+    ```
+    STATE:DANGER,LAT:9.3200,LON:79.9800\n
+    ```
+- **Boat Unit (Transmitter Node - ESP32 #1):**
+  - Interfaces directly with the VEGA processor via UART.
+  - Packages incoming state, coordinate, and SOS triggers into LoRa packets.
+  - Broadcasts packets long-range over Semtech SX1278 LoRa to the coast.
+- **Shore Station (Receiver Node - ESP32 #2):**
+  - Continuously listens for incoming LoRa transmissions from the fleet.
+  - Decodes packets and outputs real-time fleet boundary and emergency alerts to the Serial Monitor.
 
 ## Repo structure
 
+
 ```
+
 kadal-kaavalan/
 ├── firmware/
-│   ├── vega-boat-unit/       Boat unit firmware, one folder per build layer
-│   └── esp32-shore-unit/     Shore unit firmware, one folder per build layer
-└── docs/                     
+│   ├── KK_VEGA/              VEGA ARIES v2 firmware (GPS, geofence, sensors, UART output)
+│   ├── KK_ESP32_Boat/        ESP32 #1 firmware (UART receiver → LoRa broadcaster)
+│   └── KK_ESP32_Shore/       ESP32 #2 firmware (LoRa receiver → Serial Monitor fleet alerts)
+└── docs/                     Wiring diagrams, workflow playbook, explainer doc
+
 ```
 
-## Build layers
+## Geofence thresholds
 
-The firmware is built in four independently demo-able layers — if time runs out, whichever layer is complete is still a working demo.
-
-| Layer | What's added |
-|---|---|
-| 1 — MVP | Geofence state machine + LEDs |
-| 2 — Core | LoRa link (boat ↔ shore) + SOS button |
-| 3 — Full | OLED display + BMP280 storm warning + audio alerts |
-| 4 — Polish | MPU9250 man-overboard detection + real GPS + web dashboard |
+| Zone | Distance to IMBL | Local Warning Behavior | LoRa Broadcast |
+|---|---|---|---|
+| **SAFE** | > 5 NM | Normal operation / Green LED | Routine heartbeat |
+| **WARNING** | 5 NM – 1 NM | Yellow LED indicator | Status update |
+| **DANGER** | 0 NM – 1 NM | Red LED + Buzzer audible alert | High-priority alert |
+| **CROSSED** | < 0 NM (Boundary Breached) | Continuous Buzzer + Rapid Red Flash | Critical breach alarm |
+| **SOS** | Triggered via Button / MPU9250 | Immediate alarm state | Instant emergency alert |
 
 ## Flashing the firmware
 
-1. Open the relevant `.ino` file for your layer in Arduino IDE.
-2. Select the correct board (VEGA ARIES for the boat unit, an ESP32 dev board for the shore unit) and COM port under **Tools**.
-3. Install any missing libraries via **Sketch → Include Library → Manage Libraries** (LoRa by Sandeep Mistry, Adafruit SSD1306/GFX/BMP280/MPU6050, TinyGPS++).
-4. Verify/Compile, then Upload.
-5. Open the Serial Monitor at **115200 baud** to watch state/packet output.
+1. Open Arduino IDE.
+2. Flash **`KK_VEGA.ino`** to the **VEGA ARIES v2** board.
+3. Flash **`KK_ESP32_Boat.ino`** to the boat's **ESP32 #1** connected to the SX1278 LoRa module.
+4. Flash **`KK_ESP32_Shore.ino`** to the shore's **ESP32 #2** connected to the receiving LoRa module.
+5. Install necessary libraries via **Sketch → Include Library → Manage Libraries** (`LoRa` by Sandeep Mistry, `TinyGPS++`, `Adafruit BMP280`, `Adafruit MPU6050` / MPU9250 drivers).
+6. Open the Serial Monitor for ESP32 #2 at **115200 baud** to monitor live incoming fleet transmissions.
 
 ## Future plans
 
-- Solar charging enclosure (today's build is battery-only)
-- Satellite fallback for fleet-to-coast-guard range beyond LoRa mesh
-- Partnership with fishermen associations for field trials
+- Solar charging enclosure integration (prototype is currently battery-powered)[cite: 2]
+- Dedicated shore dashboard interface and multi-hop LoRa mesh networking
+- Satellite fallback for extended offshore zones beyond LoRa range[cite: 2]
+- Field trials with local coastal fishing communities[cite: 2]
 
 ## Team
 
