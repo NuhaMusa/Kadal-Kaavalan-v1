@@ -1,0 +1,26 @@
+# Arduino build artifacts
+*.hex
+*.bin
+*.elf
+*.map
+build/
+*.o
+
+# Arduino IDE temp/cache files
+*.tmp
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor/IDE folders
+.vscode/
+.idea/
+
+# Python (if used for Haversine testing scripts etc.)
+__pycache__/
+*.pyc
+
+# Logs
+*.log
