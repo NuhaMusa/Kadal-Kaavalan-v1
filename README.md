@@ -8,7 +8,7 @@ The system uses a distributed multi-controller architecture across two units:
 - **Boat Unit:** 1× VEGA ARIES v2 (THEJAS32 RISC-V SoC) + 1× ESP32 (Node 1) + Semtech SX1278 LoRa transceiver + u-blox NEO-6M GPS
 - **Shore Unit:** 1× ESP32 (Node 2) + Semtech SX1278 LoRa receiver + Live Ground Station Dashboard
 
-Built by **Team ICONIC — Shoreline Labs**, Chennai Institute of Technology (ECE), for **EMBRIX'26 VEGATHON** (BAIT × C-DAC India, Hardware Innovation Track).
+Built by **Team ICONIC — Shoreline Labs** for **EMBRIX'26 VEGATHON** (BAIT × C-DAC India, Hardware Innovation Track).
 
 ---
 
@@ -131,5 +131,3 @@ python dashboard.py
 ## Team
 
 **Team ICONIC — Shoreline Labs**
-
-Chennai Institute of Technology, Department of Electronics and Communication Engineering (ECE)
